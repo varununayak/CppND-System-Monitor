@@ -2,7 +2,9 @@
 #include <unistd.h>
 #include <string>
 #include <vector>
-
+#include <string_view>
+#include <algorithm>
+#include <iostream>
 #include "linux_parser.h"
 
 using std::stof;
@@ -13,24 +15,17 @@ using std::vector;
 // DONE: An example of how to read data from the filesystem
 string LinuxParser::OperatingSystem() {
   string line;
-  string key;
-  string value;
   std::ifstream filestream(kOSPath);
   if (filestream.is_open()) {
     while (std::getline(filestream, line)) {
-      std::replace(line.begin(), line.end(), ' ', '_');
-      std::replace(line.begin(), line.end(), '=', ' ');
-      std::replace(line.begin(), line.end(), '"', ' ');
-      std::istringstream linestream(line);
-      while (linestream >> key >> value) {
-        if (key == "PRETTY_NAME") {
-          std::replace(value.begin(), value.end(), '_', ' ');
-          return value;
-        }
+      line.erase(std::remove(line.begin(), line.end(), '"'), line.end());
+      auto keyPos = line.find('=');
+      if (line.substr(0, keyPos) == "PRETTY_NAME") {
+        return line.substr(keyPos + 1);
       }
     }
   }
-  return value;
+  return "N/A";
 }
 
 // DONE: An example of how to read data from the filesystem
