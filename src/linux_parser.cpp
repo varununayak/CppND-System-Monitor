@@ -14,9 +14,9 @@ using std::vector;
 
 // DONE: An example of how to read data from the filesystem
 string LinuxParser::OperatingSystem() {
-  string line;
   std::ifstream filestream(kOSPath);
   if (filestream.is_open()) {
+    string line;
     while (std::getline(filestream, line)) {
       line.erase(std::remove(line.begin(), line.end(), '"'), line.end());
       auto keyPos = line.find('=');
@@ -30,15 +30,17 @@ string LinuxParser::OperatingSystem() {
 
 // DONE: An example of how to read data from the filesystem
 string LinuxParser::Kernel() {
-  string os, kernel;
-  string line;
   std::ifstream stream(kProcDirectory + kVersionFilename);
   if (stream.is_open()) {
-    std::getline(stream, line);
-    std::istringstream linestream(line);
-    linestream >> os >> kernel;
+    string line;
+    if (std::getline(stream, line)) {
+      std::istringstream linestream(line);
+      string os, kernel, version;
+      linestream >> os >> version >> kernel;
+      return kernel;
+    }
   }
-  return kernel;
+  return "N/A";
 }
 
 // BONUS: Update this to use std::filesystem
@@ -61,8 +63,22 @@ vector<int> LinuxParser::Pids() {
   return pids;
 }
 
-// TODO: Read and return the system memory utilization
-float LinuxParser::MemoryUtilization() { return 0.0; }
+float LinuxParser::ProcessorMemInfo(string key) {
+  std::ifstream stream(LinuxParser::kProcDirectory + LinuxParser::kMeminfoFilename);
+  if (stream.is_open()) {
+    string line;
+    while(std::getline(stream, line)) {
+      auto keyPos = line.find(':');
+      if (line.substr(0, keyPos) == key) {
+        line.erase(std::remove(line.begin(), line.end(), ' '), line.end());
+        auto kPos = line.find('k');
+        float val = stof(line.substr(keyPos+1, kPos));
+        return val;
+      }
+    }
+  }
+  return 0.0;
+}
 
 // TODO: Read and return the system uptime
 long LinuxParser::UpTime() { return 0; }
