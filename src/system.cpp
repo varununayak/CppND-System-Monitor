@@ -3,6 +3,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 #include "process.h"
 #include "processor.h"
@@ -22,7 +23,14 @@ vector<Process>& System::Processes() {
   processes_.clear();
   for (int pid : pids) {
     processes_.emplace_back(pid);
-  }
+  };
+  for (auto& p : processes_) p.UpdateRam();
+  std::sort(processes_.begin(), processes_.end(),
+      [](const Process& a, const Process& b) -> bool
+        {   
+            return a.mbRam_ > b.mbRam_; 
+        }
+    );
   return processes_;
 }
 
