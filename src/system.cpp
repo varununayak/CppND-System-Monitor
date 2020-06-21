@@ -33,9 +33,8 @@ float System::MemoryUtilization() {
 
 std::string System::OperatingSystem() { return LinuxParser::OperatingSystem(); }
 
-int System::RunningProcesses() { return LinuxParser::ProcStatInfo("procs_running"); }
+int System::RunningProcesses() { return std::stof(LinuxParser::ProcStatInfo("procs_running")); }
 
-int System::TotalProcesses() { return LinuxParser::ProcStatInfo("processes"); }
+int System::TotalProcesses() { return std::stof(LinuxParser::ProcStatInfo("processes")); }
 
-// TODO: Return the number of seconds since the system started running
 long int System::UpTime() { return LinuxParser::UpTime(); }

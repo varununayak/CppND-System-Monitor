@@ -5,6 +5,7 @@
 #include <string_view>
 #include <algorithm>
 #include <iostream>
+#include <cassert>
 #include "linux_parser.h"
 
 using std::stof;
@@ -106,17 +107,32 @@ long LinuxParser::ActiveJiffies() { return 0; }
 long LinuxParser::IdleJiffies() { return 0; }
 
 // TODO: Read and return CPU utilization
-vector<string> LinuxParser::CpuUtilization() { return {}; }
+vector<string> LinuxParser::CpuUtilization() {
+  std::ifstream stream(kProcDirectory + kStatFilename);
+  if (stream.is_open()) {
+    string line;
+    if (std::getline(stream, line)) {
+      std::istringstream linestream(line);
+      vector<string> cpuUtilVals;
+      string val;
+      linestream >> val;
+      assert(val == "cpu");
+      while(linestream >> val)
+        cpuUtilVals.push_back(val);
+      assert(cpuUtilVals.size() == 10);
+      return cpuUtilVals;
+    }
+  }
+}
 
-int LinuxParser::ProcStatInfo(string key) { 
+string LinuxParser::ProcStatInfo(string key) { 
   std::ifstream stream(kProcDirectory + kStatFilename);
   if (stream.is_open()) {
     string line;
     while(std::getline(stream, line)) {
       auto keyPos = line.find(' ');
       if (line.substr(0, keyPos) == key) {
-        float val = stof(line.substr(keyPos+1));
-        return val;
+        return line.substr(keyPos+1);
       }
     }
   }
