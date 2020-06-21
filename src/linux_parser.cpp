@@ -64,7 +64,7 @@ vector<int> LinuxParser::Pids() {
 }
 
 float LinuxParser::ProcessorMemInfo(string key) {
-  std::ifstream stream(LinuxParser::kProcDirectory + LinuxParser::kMeminfoFilename);
+  std::ifstream stream(kProcDirectory + kMeminfoFilename);
   if (stream.is_open()) {
     string line;
     while(std::getline(stream, line)) {
@@ -80,8 +80,17 @@ float LinuxParser::ProcessorMemInfo(string key) {
   return 0.0;
 }
 
-// TODO: Read and return the system uptime
-long LinuxParser::UpTime() { return 0; }
+long LinuxParser::UpTime() {
+  std::ifstream stream(LinuxParser::kProcDirectory + LinuxParser::kUptimeFilename);
+  if (stream.is_open()) {
+    string line;
+    if (std::getline(stream, line)) {
+      auto sPos = line.find(' ');
+      return long(stof(line.substr(0, sPos)));
+    }
+  }
+  return 0;
+}
 
 // TODO: Read and return the number of jiffies for the system
 long LinuxParser::Jiffies() { return 0; }
@@ -100,7 +109,7 @@ long LinuxParser::IdleJiffies() { return 0; }
 vector<string> LinuxParser::CpuUtilization() { return {}; }
 
 int LinuxParser::ProcStatInfo(string key) { 
-  std::ifstream stream(LinuxParser::kProcDirectory + LinuxParser::kStatFilename);
+  std::ifstream stream(kProcDirectory + kStatFilename);
   if (stream.is_open()) {
     string line;
     while(std::getline(stream, line)) {
