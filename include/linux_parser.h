@@ -45,12 +45,22 @@ long ActiveJiffies();
 long ActiveJiffies(int pid);
 long IdleJiffies();
 
+// Struct for process stat 
+struct ProcessStatTimes {
+  long long unsigned int utime = 0;
+  long long unsigned int stime = 0;
+  long long unsigned int cutime = 0;
+  long long unsigned int cstime = 0;
+  long long unsigned int uptime = 0;
+  long long unsigned int starttime = 0;
+};
+
 // Processes
 std::string Command(int pid);
 std::string Ram(int pid);
 std::string Uid(int pid);
 std::string User(const std::string& uid);
-long int UpTime(int pid);
+struct ProcessStatTimes ProcessStatTimes(int pid);
 };  // namespace LinuxParser
 
 #endif
