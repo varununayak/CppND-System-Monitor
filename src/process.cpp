@@ -30,8 +30,8 @@ string Process::Ram() {
 }
 
 string Process::User() { 
-  string Uid = LinuxParser::Uid(pid_);
-  
+  string uid = LinuxParser::Uid(pid_);
+  return LinuxParser::User(uid);
 }
 
 // TODO: Return the age of this process (in seconds)
